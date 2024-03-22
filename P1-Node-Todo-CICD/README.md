@@ -190,10 +190,176 @@ Click on `SAVE AND CONTINUE` AND `SAVE AND FINISH`
 
 3. Go to Configure >> In General, Add description
 
+4. In Source code management, Write your GitHub repository URL : https://github.com/naveensilver/node-todo-cicd.git
+
+[Image]
+
+* Click on Add Credentials for Jenkins 
+
+    - select SSH username with Private key 
+
+    [IMAGE]
+
+    [image]
+
+* Add private key which we created using ssh-keygen command.
+
+    - Now, Go to linux terminal and run 
+
+    ```
+    cat .ssh/id_rsa.pub 
+    ```
+
+You will get private key and paste it.
+
+[image]
+
+* In the Build steps, Select Execute shell
+
+[Image]
+
+* In the Execute shell run the application using Docker commands
+
+```
+docker build -t node-todo-img:v1                              # it will create the image using docker file
+
+docker run -d --name node-app -p 8000:8000 node-todo-img:v1   # it will create a container from this image
+
+```
+
+[Error images]
+
+```
+docker run ubuntu:latest /bin/bash
+docker: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/create": dial unix /var/run/docker.sock: connect: permission denied.
+See 'docker run --help'.
+
+```
+
+### Troubleshooting the Docker Socket Connection Issue:
+
+By default, only root and the docker user-group members can access the Docker socket:
+
+```
+ls -l /var/run/docker.sock
+
+srw-rw---- 1 root docker 0 May 13 06:05 /var/run/docker.sock
+```
+
+We have to change the permissions to /var/run/docker.sock to ‘666‘ 
+
+```
+sudo chmod 666 /var/run/docker.sock
+
+ls -l /var/run/docker.sock
+srw-rw-rw- 1 root docker 0 Mar 13 06:05 /var/run/docker.sock
+```
+
+After restarting the Docker service, any user can manage Docker images and start containers. This indeed evades the “permission denied” issue:
+
+```
+sudo systemctl restart docker.service
+sudo systemctl status docker.service
+```
+
+* Now Go to Jenkins Dashboard and Build the pipeline again 
+
+[Finally Build Got success] [image]
+
+* Check `Console Output` 
+
+[image]
+
+* Github project repository is created in EC2 instance using jenkins job.
+
+[image]
+
+* Docker image and container is created using jenkins pipeline
+
+[images]
+
+* Browse Public IP address with port no.8000  
+```
+18.206.165.35:8000
+```
+[image]
 
 
 
+# Task-2
 
+The Jenkins pipeline will be triggered automatically by GitHub webhook integration when changes are made to the code repository.
+
+### Step 1: Configuring GitHub
+
+* Go to your GitHub account settings
+
+[image]
+
+* Go to SSH and GPG keys, Add public key that we created using ssh-keygen and select key-type Authentication key.
+
+
+[image]
+
+[image]
+
+[image]
+
+### Step 2: For GitHub-Webhook
+
+* Go to your GitHub repository and click on Settings.
+
+[image]
+
+* Click on Webhooks and then click on Add webhook.
+
+[image]
+
+* In the ‘Payload URL’ field, paste your `Jenkins environment URL`. At the end of this URL add `/github-webhook/`. In the ‘Content type’ select: ‘application/json’.
+
+[image]
+
+Ex: <http://18.206.165.35:8080>/github-webhook/
+
+### Step 3: For Installing GitHub Integration plugin in Jenkins
+
+* Open your jenkins dashboard
+
+    >> Manage jenkins > plugins > Available plugin and search "git-hub integration" plugin 
+
+[image]
+
+### Step 4: Configuring Jenkins
+
+* In build Triggers, select ‘Github hook trigger for GITScm polling’
+
+[image]
+
+apply and save it.
+
+* Do some changes in Code 
+
+[image]
+
+* Making changes to the file’s content in Github repository and commit the file. 
+[Image]
+
+* Go to Jenkins Dashboard, the pipeline will trigger automatically
+
+[image]
+
+* Pipeline will get success 
+
+[image]
+
+* Browse public IP address with port no.8000
+
+[image]
+
+
+
+Thankssss YOUUUU...
+Enjoyyyyy Pandagooo
 
 
 
